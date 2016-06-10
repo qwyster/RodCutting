@@ -4,8 +4,8 @@
 
 RodCutting::RodCutting()
 {
-	r = new int[LENGTH];
-	p = new int[LENGTH];
+	r = new int[LENGTH]();
+	p = new int[LENGTH]{1,5,8,9,10,17,17,20,24,30};
 }
 
 
