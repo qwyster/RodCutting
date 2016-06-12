@@ -8,5 +8,7 @@ public:
 	const static int LENGTH = 10;
 	RodCutting();
 	~RodCutting();
+	int doRodCutting(int);
+	int doRodCuttingMemoization(int);
 };
 
