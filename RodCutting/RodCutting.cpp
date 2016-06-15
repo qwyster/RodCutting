@@ -47,3 +47,19 @@ int RodCutting::doRodCuttingMemoization(int length)
 	r[length] = preis;
 	return preis;
 }
+
+int RodCutting::doRodCuttingBottomUp(int length,int* s)
+{
+	for (int i = 1; i <= length; i++) {
+		int preis = p[i-1];
+		s[i - 1] = i;
+		for (int j = 1; j < i; j++) {
+			if (preis < p[j - 1] + r[i - j - 1]){
+				preis = p[j - 1] + r[i - j - 1];
+				s[i-1] = j;
+			}
+		}
+		r[i-1] = preis;
+	}
+	return r[length-1];
+}

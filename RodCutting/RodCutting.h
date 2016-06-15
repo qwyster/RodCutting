@@ -10,5 +10,6 @@ public:
 	~RodCutting();
 	int doRodCutting(int);
 	int doRodCuttingMemoization(int);
+	int doRodCuttingBottomUp(int,int*);
 };
 
