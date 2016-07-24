@@ -5,7 +5,9 @@
 #include<iostream>
 #include "RodCutting.h"
 #include<ctime>
-
+#include <vector>
+#include "MatrixChainMultiplication.h"
+#include "LongestCommonSubsequence.h"
 /*
 	Solve the rod cutting problem for a rod of length l.
 	Return the highest price.
@@ -59,7 +61,7 @@ int main()
 	delete[] s;
 	std::cout << std::endl;
 	std::cin.get();*/
-	const int length = 10;
+	/*const int length = 10;
 	int* p = new int[length] {1,5,8,9,10,17,17,20,24,30};
 	int* cutSeq = new int[length];
 	cutSeq[0] = 1;
@@ -73,7 +75,27 @@ int main()
 	}
 	std::cout << std::endl;
 	delete[] cutSeq;
-	delete[] p;
+	delete[] p;*/
+	/*std::vector<std::pair<int, int>> input;
+	input.push_back(std::pair<int, int>(30,35));
+	input.push_back(std::pair<int, int>(35,15));
+	input.push_back(std::pair<int, int>(15,5));
+	input.push_back(std::pair<int, int>(5,10));
+	input.push_back(std::pair<int, int>(10,20));
+	input.push_back(std::pair<int, int>(20,25));
+	int length = input.size();
+	MatrixChainMultiplication mcm(length, input);
+	mcm.printSolution(1, length);
+	std::cout << std::endl;*/
+
+	std::string X("ACCGGTCGAGTGCGCGGAAGCCGGCCGAA");
+	std::string Y("GTCGTTCGGAATGCCGTTGCTCTGTAAA");
+	/*std::string X("ABCBDAB");
+	std::string Y("BDCABA");*/
+	LongestCommonSubsequence lcb(X, Y);
+	lcb.lcsLength();
+	lcb.printSolution(X.length(), Y.length());
+	std::cout << "\n";
 	return 0;
 }
 

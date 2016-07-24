@@ -27,6 +27,12 @@
     <ClInclude Include="RodCutting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MatrixChainMultiplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LongestCommonSubsequence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -36,6 +42,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RodCutting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixChainMultiplication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LongestCommonSubsequence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
