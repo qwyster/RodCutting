@@ -6,8 +6,11 @@
 #include "RodCutting.h"
 #include<ctime>
 #include <vector>
+#include <algorithm>
 #include "MatrixChainMultiplication.h"
 #include "LongestCommonSubsequence.h"
+using namespace std;
+
 /*
 	Solve the rod cutting problem for a rod of length l.
 	Return the highest price.
@@ -35,29 +38,50 @@ int rodCutting(int* p, int length, int l, int* cutSeq) {
 /*
 	Naive implementation. O(2^n).
 */
-int knapsack_value(int n, int* v, int* w, bool* sack, bool* considering, int weightleft,int currentValue) {
-	int i;
-	for (i = 0; i < n; i++) {
-		if (weightleft >= w[i] && considering[i]) {	// if the thief can take a_i
-			considering[i] = false;
-			bool* tmp_considering = new bool[n];
-			std::memcpy(tmp_considering, considering, sizeof(bool)*n);
-			int not_chose_i = knapsack_value(n, v, w, sack, tmp_considering, weightleft, currentValue);
-			std::memcpy(tmp_considering, considering, sizeof(bool)*n);
-			int chose_i =  knapsack_value(n, v, w, sack, tmp_considering, weightleft-w[i], currentValue+v[i]);
-			delete[] tmp_considering;
-			if (chose_i > not_chose_i) {
-				sack[i] = true;
-				return knapsack_value(n, v, w, sack, considering, weightleft - w[i], currentValue + v[i]);
-			}
-			else if (chose_i < not_chose_i){
-				return knapsack_value(n, v, w, sack, considering, weightleft, currentValue);
-			}
+//int knapsack_value(int n, int* v, int* w, bool* sack, bool* considering, int weightleft,int currentValue) {
+//	int i;
+//	for (i = 0; i < n; i++) {
+//		if (weightleft >= w[i] && considering[i]) {	// if the thief can take a_i
+//			considering[i] = false;
+//			bool* tmp_considering = new bool[n];
+//			std::memcpy(tmp_considering, considering, sizeof(bool)*n);
+//			int not_chose_i = knapsack_value(n, v, w, sack, tmp_considering, weightleft, currentValue);
+//			std::memcpy(tmp_considering, considering, sizeof(bool)*n);
+//			int chose_i =  knapsack_value(n, v, w, sack, tmp_considering, weightleft-w[i], currentValue+v[i]);
+//			delete[] tmp_considering;
+//			if (chose_i > not_chose_i) {
+//				sack[i] = true;
+//				return knapsack_value(n, v, w, sack, considering, weightleft - w[i], currentValue + v[i]);
+//			}
+//			else if (chose_i < not_chose_i){
+//				return knapsack_value(n, v, w, sack, considering, weightleft, currentValue);
+//			}
+//		}
+//	}
+//	if (i == n) return currentValue;
+//}
+
+int knapsack_value(int* v, int* w, int** s, int** reconstruct, int i, int j) {
+	if (i == 0 || j == 0) return 0;
+	if (s[i - 1][j - 1] != -1) return s[i - 1][j - 1];
+	if (j >= w[i - 1]) {
+		int chose = knapsack_value(v, w, s, reconstruct, i - 1, j - w[i - 1]) + v[i - 1];
+		int notChose = knapsack_value(v, w, s, reconstruct, i - 1, j);
+		if (chose > notChose) {
+			s[i - 1][j - 1] = chose;
+			reconstruct[i - 1][j - 1] = 1;
+		}
+		else if (chose < notChose) {
+			s[i - 1][j - 1] = chose;
+			reconstruct[i - 1][j - 1] = 0;
 		}
 	}
-	if (i == n) return currentValue;
+	else {
+		s[i - 1][j - 1] = knapsack_value(v,w,s, reconstruct,i-1,j);
+		reconstruct[i - 1][j - 1] = 0;
+	}
+	return s[i - 1][j - 1];
 }
-
 
 int main()
 {
@@ -123,21 +147,119 @@ int main()
 	//std::cout << "\n";
 
 	const int n = 3;
+	const int W = 50;
 	int w[3] = {10,20,30};
 	int v[3] = {60,100,120};
-	bool sack[3];
+
+	/*const int n = 5;
+	const int W = 20;
+	int w[n] = { 2,3,4,5,9 };
+	int v[n] = { 3,4,5,8,10 };*/
+	// naive
+	/*bool sack[3];
 	bool considering[3];
 	for (int i = 0; i < n; i++) {
 		sack[i] = false;
 		considering[i] = true;
 	}
-	int W = 50;
+	
 	int currentValue = 0;
 	std::cout << "Max value = " << knapsack_value(n, v, w, sack, considering, W,currentValue) << std::endl;
 	std::cout << "Solution: ";
 	for (int i = 0; i < n; i++)
 		if (sack[i]) std::cout << i << " ";
-	std::cout << std::endl;
+	std::cout << std::endl;*/
+
+	int** s;
+	int** reconstruct;
+	// iterative implementation	
+	s = new int*[n+1];
+	reconstruct = new int*[n + 1];
+
+	for (int i = 0; i < n+1; i++) {
+		s[i] = new int[W+1];
+		reconstruct[i] = new int[W + 1];
+		memset(s[i], -1, sizeof(int)*(W + 1));
+		memset(reconstruct[i], -1, sizeof(int)*(W + 1));
+	}
+	for (int j = 0; j < W + 1; j++) s[0][j] = 0;
+	for (int i = 0; i < n + 1; i++) s[i][0] = 0;
+	
+	for (int i = 1; i < n+1; i++)
+		for (int j = 1; j < W + 1; j++) {
+			if (w[i-1] <= j) {
+				int chosen = v[i - 1] + s[i - 1][j - w[i - 1]];
+				int notChosen = s[i - 1][j];
+				if (chosen > notChosen) {
+					s[i][j] = chosen;
+					reconstruct[i][j] = 1;
+				}
+				else if (chosen < notChosen){
+					s[i][j] = s[i - 1][j];
+					reconstruct[i][j] = 0;
+				}
+			}
+			else {
+				s[i][j] = s[i - 1][j];
+				reconstruct[i][j] = 0;
+			}
+	}
+	cout << "max value = " << s[n][W] << endl;
+	cout << "Solution: ";
+	int i = n;
+	int j = W;
+	while (s[i][j] > 0) {
+		if (reconstruct[i][j] == 1) {
+			cout << "A" << i << " ";
+			j -= w[i - 1];
+			i--;
+		}
+		else {
+			i--;
+		}
+	}
+	cout << endl;
+	for (int i = 0; i < n+1; i++) {
+		delete[] s[i];
+		delete[] reconstruct[i];
+	}
+	delete[] reconstruct;
+	delete[] s;
+
+	//s = new int*[n];
+	//reconstruct = new int*[n];	// reconstruct[i][j] = 1 if A_i is chosen, = 0 otherwise
+
+	//for (int i = 0; i < n; i++) {
+	//	s[i] = new int[W];
+	//	reconstruct[i] = new int[W];
+	//	memset(reconstruct[i], -1, sizeof(int)*W);
+	//	memset(s[i], -1, sizeof(int)*W);
+	//}
+	//cout << "max value = " << knapsack_value(v, w, s, reconstruct, n, W) << endl;
+	//// reconstruct a solution
+	//cout << "Optimal solution: ";
+	//int i = n-1;
+	//int j = W-1;
+	//int weight = W;
+	//while (i >=0 && j>=0) {
+	//	if (reconstruct[i][j] == 1) {
+	//		cout << "A" << i + 1 << " ";
+	//		weight -= w[i];
+	//		j -= w[i];
+	//		i--;
+	//	}
+	//	else {
+	//		i--;
+	//	}
+	//}
+	//cout << endl;
+
+	//for (int i = 0; i < n; i++) {
+	//	delete[] s[i];
+	//	delete[] reconstruct[i];
+	//}
+	//delete[] s;
+	//delete[] reconstruct;
 	return 0;
 }
 
