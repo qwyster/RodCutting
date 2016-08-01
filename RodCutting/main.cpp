@@ -32,10 +32,35 @@ int rodCutting(int* p, int length, int l, int* cutSeq) {
 	return result;
 }
 
+/*
+	Naive implementation. O(2^n).
+*/
+int knapsack_value(int n, int* v, int* w, bool* sack, bool* considering, int weightleft,int currentValue) {
+	int i;
+	for (i = 0; i < n; i++) {
+		if (weightleft >= w[i] && considering[i]) {	// if the thief can take a_i
+			considering[i] = false;
+			bool* tmp_considering = new bool[n];
+			std::memcpy(tmp_considering, considering, sizeof(bool)*n);
+			int not_chose_i = knapsack_value(n, v, w, sack, tmp_considering, weightleft, currentValue);
+			std::memcpy(tmp_considering, considering, sizeof(bool)*n);
+			int chose_i =  knapsack_value(n, v, w, sack, tmp_considering, weightleft-w[i], currentValue+v[i]);
+			delete[] tmp_considering;
+			if (chose_i > not_chose_i) {
+				sack[i] = true;
+				return knapsack_value(n, v, w, sack, considering, weightleft - w[i], currentValue + v[i]);
+			}
+			else if (chose_i < not_chose_i){
+				return knapsack_value(n, v, w, sack, considering, weightleft, currentValue);
+			}
+		}
+	}
+	if (i == n) return currentValue;
+}
+
+
 int main()
 {
-	
-
 	/*RodCutting rc;
 	int length = 8;
 	
@@ -88,14 +113,31 @@ int main()
 	mcm.printSolution(1, length);
 	std::cout << std::endl;*/
 
-	std::string X("ACCGGTCGAGTGCGCGGAAGCCGGCCGAA");
-	std::string Y("GTCGTTCGGAATGCCGTTGCTCTGTAAA");
-	/*std::string X("ABCBDAB");
-	std::string Y("BDCABA");*/
-	LongestCommonSubsequence lcb(X, Y);
-	lcb.lcsLength();
-	lcb.printSolution(X.length(), Y.length());
-	std::cout << "\n";
+	//std::string X("ACCGGTCGAGTGCGCGGAAGCCGGCCGAA");
+	//std::string Y("GTCGTTCGGAATGCCGTTGCTCTGTAAA");
+	///*std::string X("ABCBDAB");
+	//std::string Y("BDCABA");*/
+	//LongestCommonSubsequence lcb(X, Y);
+	//lcb.lcsLength();
+	//lcb.printSolution(X.length(), Y.length());
+	//std::cout << "\n";
+
+	const int n = 3;
+	int w[3] = {10,20,30};
+	int v[3] = {60,100,120};
+	bool sack[3];
+	bool considering[3];
+	for (int i = 0; i < n; i++) {
+		sack[i] = false;
+		considering[i] = true;
+	}
+	int W = 50;
+	int currentValue = 0;
+	std::cout << "Max value = " << knapsack_value(n, v, w, sack, considering, W,currentValue) << std::endl;
+	std::cout << "Solution: ";
+	for (int i = 0; i < n; i++)
+		if (sack[i]) std::cout << i << " ";
+	std::cout << std::endl;
 	return 0;
 }
 
